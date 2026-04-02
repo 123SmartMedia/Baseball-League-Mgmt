@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Design System Tokens (white-label overrideable) ─── */
+:root {
+  --primary: 220 90% 50%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222 47% 11%;
+
+  --background: 0 0% 100%;
+  --foreground: 222 47% 11%;
+
+  --muted: 210 40% 96%;
+  --muted-foreground: 215 16% 47%;
+
+  --accent: 12 90% 55%;
+
+  --border: 214 32% 91%;
+  --card: 0 0% 100%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  h1 {
+    @apply text-4xl font-bold leading-tight;
+  }
+
+  h2 {
+    @apply text-2xl font-semibold leading-snug;
+  }
+
+  h3 {
+    @apply text-xl font-semibold;
+  }
+}
+
+@layer utilities {
+  .container-app {
+    @apply mx-auto w-full max-w-container px-4 sm:px-6;
+  }
+
+  .tap-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+
+  .card-hover {
+    @apply transition-all duration-150 hover:shadow-md hover:-translate-y-0.5;
+  }
+}
