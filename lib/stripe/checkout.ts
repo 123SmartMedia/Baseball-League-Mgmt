@@ -1,4 +1,4 @@
-import { stripe } from "./client";
+import { getStripe } from "./client";
 
 interface CreateCheckoutParams {
   priceAmountCents: number;
@@ -15,7 +15,7 @@ export async function createCheckoutSession({
   cancelUrl,
   metadata,
 }: CreateCheckoutParams) {
-  return stripe.checkout.sessions.create({
+  return getStripe().checkout.sessions.create({
     payment_method_types: ["card"],
     line_items: [
       {
