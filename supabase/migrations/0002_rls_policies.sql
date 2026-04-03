@@ -274,6 +274,6 @@ create policy "board_comments: author or admin can delete"
   );
 
 -- ============================================================
--- STANDINGS VIEW — grant read to authenticated users
+-- STANDINGS VIEW — grant read to all users (public leagues/tournaments pages)
 -- ============================================================
-grant select on standings to authenticated;
+grant select on standings to anon, authenticated;
