@@ -53,39 +53,48 @@ export default function SignupPage() {
 
     setLoading(true);
 
-    const res = await fetch("/api/users/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email:           form.email,
-        password:        form.password,
-        full_name:       form.full_name,
-        organization_id: form.organization_id,
-      }),
-    });
+    try {
+      const res = await fetch("/api/users/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email:           form.email,
+          password:        form.password,
+          full_name:       form.full_name,
+          organization_id: form.organization_id,
+        }),
+      });
 
-    const data = await res.json();
-    setLoading(false);
+      let data: { error?: string } = {};
+      try {
+        data = await res.json();
+      } catch {
+        // Non-JSON response (e.g. 500 from missing env var)
+      }
 
-    if (!res.ok) {
-      setError(data.error ?? "Something went wrong. Please try again.");
-      return;
+      if (!res.ok) {
+        setError(data.error ?? `Server error (${res.status}). Please try again.`);
+        return;
+      }
+
+      // Auto sign in after account creation
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: form.email,
+        password: form.password,
+      });
+
+      if (signInError) {
+        setSuccess(true);
+        return;
+      }
+
+      router.push("/dashboard");
+      router.refresh();
+    } catch (err) {
+      setError("Network error. Please check your connection and try again.");
+    } finally {
+      setLoading(false);
     }
-
-    // Auto sign in after account creation
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: form.email,
-      password: form.password,
-    });
-
-    if (signInError) {
-      // Account created but sign-in failed — send to login
-      setSuccess(true);
-      return;
-    }
-
-    router.push("/dashboard");
-    router.refresh();
   }
 
   if (success) {
