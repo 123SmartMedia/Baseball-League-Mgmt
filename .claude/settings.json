@@ -5,7 +5,8 @@
       "mcp__claude_ai_Vercel__deploy_to_vercel",
       "Bash(vercel --version)",
       "Bash(vercel deploy:*)",
-      "Bash(vercel env:*)"
+      "Bash(vercel env:*)",
+      "mcp__claude_ai_Supabase__apply_migration"
     ]
   }
 }
