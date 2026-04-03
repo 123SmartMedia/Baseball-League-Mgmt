@@ -1,12 +1,14 @@
 # Project Status – Baseball League Mgmt Platform
 
-**Last Updated:** April 2, 2026
+**Last Updated:** April 3, 2026
 
 ---
 
 ## 🏗️ Overview
 
-Premium, mobile-first, white-label youth sports league management platform built on Next.js 16 (App Router), Supabase, Tailwind CSS, and deployed to Vercel.
+Premium, mobile-first, white-label youth sports league management platform built on Next.js 16 (App Router), Supabase, Tailwind CSS, deployed to Vercel.
+
+**Live URL:** https://baseball-league-mgmt.vercel.app
 
 ---
 
@@ -16,122 +18,102 @@ Premium, mobile-first, white-label youth sports league management platform built
 - [x] Next.js 16 App Router project scaffolded
 - [x] Tailwind CSS with full design system (CSS variables, white-label color tokens)
 - [x] Supabase project connected via MCP (`ejrbawauwyjfldpurewq`)
-- [x] `.env.local` configured with Supabase URL and anon key
+- [x] `.env.local` configured with Supabase URL, anon key, service role key
 - [x] TypeScript strict mode — zero errors
 - [x] ESLint configured
-- [x] `autoprefixer` installed and PostCSS configured
+- [x] `autoprefixer` + `.npmrc` (legacy-peer-deps for Vercel)
+- [x] Vercel deployment — 25 routes live
+- [x] GitHub repo — https://github.com/123SmartMedia/Baseball-League-Mgmt
 
 ### Database (Supabase)
 - [x] Full schema applied — migrations `0001_initial_schema` + `0002_rls_policies`
 - [x] Tables: `organizations`, `profiles`, `leagues`, `tournaments`, `teams`, `players`, `games`, `rules`, `board_categories`, `board_threads`, `board_comments`
 - [x] `standings` view — computed from games, no duplication
-- [x] Triggers: auto-create profile on signup, auto-update team W/L on game final
+- [x] Triggers: `handle_new_user` (hardened — never blocks user creation), `update_team_record` (auto W/L on game final)
 - [x] Row Level Security — all tables org-scoped, role-based (admin/coach)
-- [x] Public read policies for public-facing pages (leagues, teams, games, standings, rules)
+- [x] Public read policies for public-facing pages
 - [x] Seed data: 1 org, 2 leagues, 1 tournament, 4 teams, 4 games, 4 rules, 3 board categories
 
-### Auth
+### Auth & User Management
 - [x] Supabase Auth wired up (email + password)
-- [x] Auth middleware — protects all portal routes, redirects to `/login`
+- [x] Auth middleware — protects all portal routes
 - [x] Auth callback route (`/api/auth/callback`)
-- [x] Login page (`/login`)
-- [x] Forgot password page (`/forgot-password`) with SendGrid reset flow
+- [x] Login page (`/login`) — links to signup
+- [x] Forgot password page (`/forgot-password`)
+- [x] Coach self-signup (`/signup`) — picks org, auto-signed in, role = coach
+- [x] Admin invite flow (`/users` portal + `/api/users/invite`) — sends magic link, sets any role
+- [x] Service role Supabase client (`lib/supabase/admin.ts`)
+- [x] Profile upsert as belt-and-suspenders after user creation
 
 ### Public Site
-- [x] Public navbar (mobile slide-out + desktop horizontal)
+- [x] Public navbar (mobile slide-out + desktop)
 - [x] Public footer
-- [x] Leagues listing page (`/leagues`) — live Supabase data
-- [x] League detail page (`/leagues/[id]`) — 5 tabs, all live data:
-  - Overview (stats, upcoming games preview, standings snapshot)
-  - Teams (TeamCard grid)
-  - Schedule (ScheduleList grouped by date, collapsible)
-  - Standings (StandingsTable, mobile scrollable)
-  - Rules (rule cards with deep-link anchors)
+- [x] Leagues listing (`/leagues`) — live data, card grid
+- [x] League detail (`/leagues/[id]`) — 5 tabs, all live:
+  - Overview, Teams, Schedule, Standings, Rules
+- [x] Tournaments listing (`/tournaments`) — active/upcoming badges, entry fee
+- [x] Tournament detail (`/tournaments/[id]`) — 5 tabs, reuses league components
 
 ### Portal (Coach/Admin)
 - [x] Portal layout — sidebar (desktop) + topbar
-- [x] Dashboard (`/dashboard`):
-  - Welcome header with role badge
-  - Stats row — total teams, games played, games scheduled (admin only)
-  - Upcoming games (next 5)
-  - Recent results
-  - My teams / All teams
+- [x] Dashboard (`/dashboard`) — stats (admin), upcoming games, recent results, teams
 - [x] Teams list (`/teams`) — role-filtered
 - [x] Roster management (`/teams/[id]/roster`):
-  - Add player via FormModal
-  - Edit player (pre-filled form)
-  - Remove player (with confirmation)
-  - CSV bulk upload (validates required columns)
+  - Add / edit / delete players via FormModal
+  - CSV bulk upload with validation
   - Parent info visible to admins only
   - Coach access restricted to own team
+- [x] Schedule (`/schedule`) — filter bar, Enter Score / Edit Score buttons (admin)
+- [x] Score entry (`ScoreEntryModal`) — scores + status, fires W/L trigger on final
+- [x] Users (`/users`) — admin only, user list + invite modal
 
 ### Components Built
-- [x] `GameCard` — status badge, scores, winner highlight
-- [x] `TeamCard` — record, win pct, CTA
-- [x] `PlayerCard` — jersey bubble, DOB, parent info (role-gated)
-- [x] `StandingsTable` — sticky column, mobile scrollable, row highlight
-- [x] `ScheduleList` — grouped by date, collapsible sections
-- [x] `FormModal` — slide-up on mobile, centered on desktop, Escape to close
-- [x] `Button` — primary / secondary / ghost variants
-- [x] `Badge` — scheduled / live / final / cancelled
-- [x] `Input` — label, error state, focus ring
+- [x] `GameCard`, `TeamCard`, `PlayerCard`
+- [x] `StandingsTable`, `ScheduleList`, `FormModal`
+- [x] `Button`, `Badge`, `Input`
+- [x] `LeagueTabs`, `TournamentTabs`
+- [x] `ScoreEntryModal`, `ScheduleClient`
+- [x] `RosterClient`, `PlayerForm`, `CsvUpload`
+- [x] `InviteUserModal`, `UsersClient`
+- [x] `StatCard`, `UpcomingGames`, `RecentResults`, `MyTeams`
 
 ### API Routes
 - [x] `POST /api/players` — create player
 - [x] `PATCH /api/players/[id]` — update player
 - [x] `DELETE /api/players/[id]` — remove player
+- [x] `PATCH /api/games/[id]` — score entry (admin only)
+- [x] `POST /api/users/signup` — coach self-registration
+- [x] `POST /api/users/invite` — admin invites user (any role)
 - [x] `POST /api/stripe/webhook` — Stripe webhook handler (stubbed)
 - [x] `GET /api/auth/callback` — Supabase OAuth callback
 
-### Lib / Utilities
-- [x] `lib/supabase/client.ts` — browser Supabase client
-- [x] `lib/supabase/server.ts` — server Supabase client (async cookies)
-- [x] `lib/stripe/client.ts` + `checkout.ts`
-- [x] `lib/messaging/email.ts` — SendGrid (REST, no SDK)
-- [x] `lib/messaging/sms.ts` — Twilio (REST, no SDK)
-- [x] `lib/utils.ts` — `cn()`, `formatDate()`, `formatTime()`, `formatCurrency()`, `winPct()`
-- [x] `lib/data/leagues.ts` — league data queries
-- [x] `lib/data/teams.ts` — team + roster queries
-- [x] `lib/data/dashboard.ts` — dashboard data queries
-
-### Config / Types
-- [x] `config/org.ts` — `OrgBranding`, `brandingToCssVars()`
-- [x] `config/nav.ts` — portal + public nav definitions
-- [x] `types/index.ts` — all domain types
-- [x] `types/supabase.ts` — hand-authored Supabase DB types
-- [x] `hooks/useSupabase.ts`, `useAuth.ts`, `useOrg.ts`
-
 ---
 
-## 🔲 In Progress / Next Up
+## 🔲 Next Up
 
 ### High Priority
-- [ ] Score entry — admin inputs game scores, status → final, W/L auto-updates
-- [ ] Tournament detail page — same tab pattern as leagues
-- [ ] Create first admin user flow (currently manual via Supabase dashboard)
+- [ ] **Admin: Assign coach to team** — coaches who sign up have no team assigned; admin needs UI to set `coach_id` on a team. Coaches currently see empty `/teams` and can't access roster.
+- [ ] **Portal standings page** — `/standings` is a stub; needs league/tournament selector + StandingsTable
+- [ ] **Portal rules page** — `/rules` is a stub; needs rules list (admin CRUD)
+- [ ] **Home/landing page** — `/` is blank; needs marketing content
 
-### Portal Features
-- [ ] Schedule page — list view + add game form (admin)
-- [ ] Standings page — full standings for all leagues
-- [ ] Rules page — manage rules (admin CRUD)
+### UX / Polish
+- [ ] **Empty state for coaches** — when coach has no team, show clear message + contact admin prompt instead of blank page
+- [ ] **Toast notifications** — replace `alert()` in CSV upload with proper toast (component exists in UsersClient, needs to be shared)
+- [ ] **Loading skeletons** — no loading states on server-fetched pages
+- [ ] **Fix Next.js middleware deprecation warning** — rename `middleware.ts` → `proxy.ts` per Next.js 16
+
+### Features
 - [ ] Message board — categories, threads, comments, moderation
-- [ ] Messaging — compose email/SMS to parents
-
-### Payments
-- [ ] Stripe checkout — tournament registration
-- [ ] Webhook handler — fulfill registration on payment complete
-
-### Public Site
-- [ ] Home page — marketing/discovery landing
-- [ ] Tournaments listing + detail page
-- [ ] PWA manifest + service worker
+- [ ] Messaging — compose email/SMS to parents (SendGrid + Twilio wired, no UI)
+- [ ] Payments — Stripe checkout for tournament registration
+- [ ] Admin: create/edit/delete leagues and tournaments from portal
+- [ ] Admin: create/edit games (schedule management)
 
 ### Infrastructure
-- [ ] Vercel deployment
-- [ ] GitHub Actions CI (lint + type check)
 - [ ] Supabase generated types (`npx supabase gen types typescript`)
-- [ ] Error boundaries + loading skeletons
-- [ ] Toast notifications (replace `alert()` in CSV upload)
+- [ ] Error boundaries + 404 page
+- [ ] PWA manifest + service worker
 
 ---
 
@@ -142,10 +124,10 @@ Premium, mobile-first, white-label youth sports league management platform built
 | Frontend | Next.js 16 (App Router), TypeScript, Tailwind CSS |
 | Backend | Supabase (PostgreSQL 17 + Auth) |
 | Payments | Stripe (webhook ready, checkout stubbed) |
-| Email | SendGrid (REST) |
-| SMS | Twilio (REST) |
-| Hosting | Vercel (not yet deployed) |
-| Version Control | GitHub |
+| Email | SendGrid (REST, no UI yet) |
+| SMS | Twilio (REST, no UI yet) |
+| Hosting | Vercel — https://baseball-league-mgmt.vercel.app |
+| Version Control | GitHub — https://github.com/123SmartMedia/Baseball-League-Mgmt |
 
 ---
 
@@ -158,16 +140,28 @@ Premium, mobile-first, white-label youth sports league management platform built
 | Seed data | `supabase/seed.sql` |
 | Design tokens | `app/globals.css` |
 | Domain types | `types/index.ts` |
-| Org branding config | `config/org.ts` |
+| Org branding | `config/org.ts` |
 | Auth middleware | `middleware.ts` |
+| Admin Supabase client | `lib/supabase/admin.ts` |
 
 ---
 
 ## 🔑 Environment Variables
 
-See `.env.local.example`. Required:
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET`
-- `SENDGRID_API_KEY` + `SENDGRID_FROM_EMAIL`
-- `TWILIO_ACCOUNT_SID` + `TWILIO_AUTH_TOKEN` + `TWILIO_PHONE_NUMBER`
+| Variable | Where |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Vercel + `.env.local` |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Vercel + `.env.local` |
+| `SUPABASE_SERVICE_ROLE_KEY` | Vercel + `.env.local` |
+| `STRIPE_SECRET_KEY` | Not yet set |
+| `STRIPE_WEBHOOK_SECRET` | Not yet set |
+| `SENDGRID_API_KEY` | Not yet set |
+| `TWILIO_ACCOUNT_SID` | Not yet set |
+
+---
+
+## ⚠️ Known Issues
+
+- Coaches who self-signup have no team assigned — admin must manually set `coach_id` via Supabase dashboard until "Assign Coach" UI is built
+- New admin accounts must be manually promoted in Supabase (`profiles.role = 'admin'`) until admin invite flow is used
+- Next.js middleware deprecation warning on every build (`middleware` → `proxy`)
