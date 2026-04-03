@@ -22,7 +22,7 @@ Premium, mobile-first, white-label youth sports league management platform built
 - [x] TypeScript strict mode — zero errors
 - [x] ESLint configured
 - [x] `autoprefixer` + `.npmrc` (legacy-peer-deps for Vercel)
-- [x] Vercel deployment — 25 routes live
+- [x] Vercel deployment — live
 - [x] GitHub repo — https://github.com/123SmartMedia/Baseball-League-Mgmt
 
 ### Database (Supabase)
@@ -32,6 +32,7 @@ Premium, mobile-first, white-label youth sports league management platform built
 - [x] Triggers: `handle_new_user` (hardened — never blocks user creation), `update_team_record` (auto W/L on game final)
 - [x] Row Level Security — all tables org-scoped, role-based (admin/coach)
 - [x] Public read policies for public-facing pages
+- [x] `standings` view granted to `anon` role (public league/tournament standings)
 - [x] Seed data: 1 org, 2 leagues, 1 tournament, 4 teams, 4 games, 4 rules, 3 board categories
 
 ### Auth & User Management
@@ -48,6 +49,7 @@ Premium, mobile-first, white-label youth sports league management platform built
 ### Public Site
 - [x] Public navbar (mobile slide-out + desktop)
 - [x] Public footer
+- [x] **Home/landing page** (`/`) — hero, live stats bar, features grid, active leagues, upcoming tournaments, coach CTA
 - [x] Leagues listing (`/leagues`) — live data, card grid
 - [x] League detail (`/leagues/[id]`) — 5 tabs, all live:
   - Overview, Teams, Schedule, Standings, Rules
@@ -57,31 +59,51 @@ Premium, mobile-first, white-label youth sports league management platform built
 ### Portal (Coach/Admin)
 - [x] Portal layout — sidebar (desktop) + topbar
 - [x] Dashboard (`/dashboard`) — stats (admin), upcoming games, recent results, teams
-- [x] Teams list (`/teams`) — role-filtered
+- [x] Teams list (`/teams`) — role-filtered, assigned coach shown
+- [x] **Assign coach to team** (`/teams`) — admin can assign/reassign coach via modal, optimistic update
 - [x] Roster management (`/teams/[id]/roster`):
   - Add / edit / delete players via FormModal
   - CSV bulk upload with validation
   - Parent info visible to admins only
   - Coach access restricted to own team
-- [x] Schedule (`/schedule`) — filter bar, Enter Score / Edit Score buttons (admin)
-- [x] Score entry (`ScoreEntryModal`) — scores + status, fires W/L trigger on final
+- [x] **Schedule** (`/schedule`) — full admin CRUD:
+  - Add game (teams, date/time, field, league/tournament)
+  - Edit game details
+  - Enter/edit scores with status (Scheduled/Live/Final/Cancelled)
+  - Delete game with confirmation
+  - Filter bar (All / Upcoming / Live / Final)
+- [x] **Standings** (`/standings`) — league/tournament toggle + selector, ranked table (GP, W, L, PCT, RF, RA, DIFF)
+- [x] **Rules** (`/rules`) — admin CRUD (add/edit/delete), filter by event type (All/League/Tournament)
 - [x] Users (`/users`) — admin only, user list + invite modal
 
 ### Components Built
 - [x] `GameCard`, `TeamCard`, `PlayerCard`
-- [x] `StandingsTable`, `ScheduleList`, `FormModal`
+- [x] `StandingsTable` — rank, GP, W, L, PCT, RF, RA, color-coded run differential
+- [x] `ScheduleList`, `FormModal`
 - [x] `Button`, `Badge`, `Input`
 - [x] `LeagueTabs`, `TournamentTabs`
-- [x] `ScoreEntryModal`, `ScheduleClient`
+- [x] `ScoreEntryModal`, `ScheduleClient` (with add/edit/delete)
+- [x] `GameFormModal` — create/edit game form
 - [x] `RosterClient`, `PlayerForm`, `CsvUpload`
 - [x] `InviteUserModal`, `UsersClient`
 - [x] `StatCard`, `UpcomingGames`, `RecentResults`, `MyTeams`
+- [x] `AssignCoachModal`
+- [x] `TeamsClient`
+- [x] `StandingsClient` — portal standings with league/tournament selector
+- [x] `RulesClient` — portal rules with filter + admin CRUD
+- [x] `LeagueStandings`, `LeagueRules`, `LeagueOverview`, `LeagueTeams`, `LeagueSchedule`
 
 ### API Routes
 - [x] `POST /api/players` — create player
 - [x] `PATCH /api/players/[id]` — update player
 - [x] `DELETE /api/players/[id]` — remove player
-- [x] `PATCH /api/games/[id]` — score entry (admin only)
+- [x] `POST /api/games` — create game (admin only)
+- [x] `PATCH /api/games/[id]` — score entry + schedule edits (admin only)
+- [x] `DELETE /api/games/[id]` — remove game (admin only)
+- [x] `PATCH /api/teams/[id]` — assign coach / update team name (admin only)
+- [x] `POST /api/rules` — create rule (admin only)
+- [x] `PATCH /api/rules/[id]` — update rule (admin only)
+- [x] `DELETE /api/rules/[id]` — remove rule (admin only)
 - [x] `POST /api/users/signup` — coach self-registration
 - [x] `POST /api/users/invite` — admin invites user (any role)
 - [x] `POST /api/stripe/webhook` — Stripe webhook handler (stubbed)
@@ -91,24 +113,19 @@ Premium, mobile-first, white-label youth sports league management platform built
 
 ## 🔲 Next Up
 
-### High Priority
-- [ ] **Admin: Assign coach to team** — coaches who sign up have no team assigned; admin needs UI to set `coach_id` on a team. Coaches currently see empty `/teams` and can't access roster.
-- [ ] **Portal standings page** — `/standings` is a stub; needs league/tournament selector + StandingsTable
-- [ ] **Portal rules page** — `/rules` is a stub; needs rules list (admin CRUD)
-- [ ] **Home/landing page** — `/` is blank; needs marketing content
+### Medium Priority
+- [ ] **Admin: create/edit leagues and tournaments** — currently requires Supabase dashboard; no portal UI
+- [ ] **Message board** — categories, threads, comments, moderation (DB tables exist: `board_categories`, `board_threads`, `board_comments`)
 
-### UX / Polish
-- [ ] **Empty state for coaches** — when coach has no team, show clear message + contact admin prompt instead of blank page
-- [ ] **Toast notifications** — replace `alert()` in CSV upload with proper toast (component exists in UsersClient, needs to be shared)
+### Polish
+- [ ] **Toast notifications** — replace `alert()` in CSV upload with proper shared toast component
 - [ ] **Loading skeletons** — no loading states on server-fetched pages
-- [ ] **Fix Next.js middleware deprecation warning** — rename `middleware.ts` → `proxy.ts` per Next.js 16
+- [ ] **Fix Next.js middleware deprecation warning** — rename `middleware.ts` per Next.js 16
 
 ### Features
-- [ ] Message board — categories, threads, comments, moderation
 - [ ] Messaging — compose email/SMS to parents (SendGrid + Twilio wired, no UI)
 - [ ] Payments — Stripe checkout for tournament registration
-- [ ] Admin: create/edit/delete leagues and tournaments from portal
-- [ ] Admin: create/edit games (schedule management)
+- [ ] Admin: create/edit games on public schedule pages
 
 ### Infrastructure
 - [ ] Supabase generated types (`npx supabase gen types typescript`)
@@ -162,6 +179,6 @@ Premium, mobile-first, white-label youth sports league management platform built
 
 ## ⚠️ Known Issues
 
-- Coaches who self-signup have no team assigned — admin must manually set `coach_id` via Supabase dashboard until "Assign Coach" UI is built
-- New admin accounts must be manually promoted in Supabase (`profiles.role = 'admin'`) until admin invite flow is used
 - Next.js middleware deprecation warning on every build (`middleware` → `proxy`)
+- No loading skeletons on server-fetched pages
+- CSV upload uses `alert()` instead of toast notifications
