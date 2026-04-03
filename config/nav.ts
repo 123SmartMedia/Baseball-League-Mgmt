@@ -12,6 +12,7 @@ export const PORTAL_NAV: NavItem[] = [
   { label: "Rules", href: "/rules" },
   { label: "Message Board", href: "/board" },
   { label: "Messaging", href: "/messages", adminOnly: true },
+  { label: "Users", href: "/users", adminOnly: true },
 ];
 
 export const PUBLIC_NAV: NavItem[] = [

@@ -11,6 +11,7 @@ const PROTECTED_PATHS = [
   "/rules",
   "/board",
   "/messages",
+  "/users",
 ];
 
 export async function middleware(req: NextRequest) {
@@ -19,8 +20,11 @@ export async function middleware(req: NextRequest) {
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api/auth") ||
+    pathname.startsWith("/api/users/signup") ||
     pathname.startsWith("/api/stripe/webhook") ||
-    pathname === "/login"
+    pathname === "/login" ||
+    pathname === "/signup" ||
+    pathname === "/forgot-password"
   ) {
     return NextResponse.next();
   }

@@ -100,13 +100,10 @@ export default function LoginPage() {
         </div>
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
-          Need access?{" "}
-          <a
-            href="mailto:admin@leagueplatform.com"
-            className="font-medium text-foreground hover:underline"
-          >
-            Contact your administrator
-          </a>
+          New coach?{" "}
+          <Link href="/signup" className="font-medium text-foreground hover:underline">
+            Create an account
+          </Link>
         </p>
       </div>
     </div>
