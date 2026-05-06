@@ -2,35 +2,34 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getProfile } from "@/lib/data/dashboard";
 import { createClient } from "@/lib/supabase/server";
-import { MessagesClient } from "@/components/messages/MessagesClient";
-import type { Team } from "@/types";
+import { LeaguesPortalClient } from "@/components/leagues/LeaguesPortalClient";
+import type { League } from "@/types";
 
-export const metadata: Metadata = { title: "Messaging" };
+export const metadata: Metadata = { title: "Leagues" };
 
-export default async function MessagesPage() {
+export default async function LeaguesPortalPage() {
   const profile = await getProfile();
   if (!profile) redirect("/login");
   if (profile.role !== "admin") redirect("/dashboard");
 
   const supabase = await createClient();
   const { data } = await supabase
-    .from("teams")
+    .from("leagues")
     .select("*")
     .eq("organization_id", profile.organization_id)
-    .order("name", { ascending: true });
+    .order("start_date", { ascending: false });
 
-  const teams = (data ?? []) as Team[];
+  const leagues = (data ?? []) as League[];
 
   return (
     <div>
       <div className="mb-6">
-        <h2>Send Message</h2>
+        <h2>Leagues</h2>
         <p className="text-sm text-muted-foreground">
-          Send email or SMS to coaches, teams, or your whole organization.
+          {leagues.length} league{leagues.length !== 1 ? "s" : ""} · Create and manage your organization&apos;s leagues.
         </p>
       </div>
-
-      <MessagesClient teams={teams} />
+      <LeaguesPortalClient initialLeagues={leagues} />
     </div>
   );
 }

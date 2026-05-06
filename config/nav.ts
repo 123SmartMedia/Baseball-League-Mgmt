@@ -5,17 +5,19 @@ export interface NavItem {
 }
 
 export const PORTAL_NAV: NavItem[] = [
-  { label: "Dashboard", href: "/dashboard" },
-  { label: "Teams", href: "/teams" },
-  { label: "Schedule", href: "/schedule" },
-  { label: "Standings", href: "/standings" },
-  { label: "Rules", href: "/rules" },
+  { label: "Dashboard",     href: "/dashboard" },
+  { label: "Teams",         href: "/teams" },
+  { label: "Schedule",      href: "/schedule" },
+  { label: "Standings",     href: "/standings" },
+  { label: "Rules",         href: "/rules" },
   { label: "Message Board", href: "/board" },
-  { label: "Messaging", href: "/messages", adminOnly: true },
-  { label: "Users", href: "/users", adminOnly: true },
+  { label: "Messaging",     href: "/messages",     adminOnly: true },
+  { label: "Leagues",       href: "/admin/leagues",      adminOnly: true },
+  { label: "Tournaments",   href: "/admin/tournaments",  adminOnly: true },
+  { label: "Users",         href: "/users",        adminOnly: true },
 ];
 
 export const PUBLIC_NAV: NavItem[] = [
-  { label: "Leagues", href: "/leagues" },
+  { label: "Leagues",     href: "/leagues" },
   { label: "Tournaments", href: "/tournaments" },
 ];

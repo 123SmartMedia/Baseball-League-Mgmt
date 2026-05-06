@@ -4,9 +4,18 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { PORTAL_NAV } from "@/config/nav";
 import { cn } from "@/lib/utils";
+import type { UserRole } from "@/types";
 
-export function PortalSidebar() {
+interface PortalSidebarProps {
+  role?: UserRole;
+}
+
+export function PortalSidebar({ role }: PortalSidebarProps) {
   const pathname = usePathname();
+
+  const visibleNav = PORTAL_NAV.filter(
+    (item) => !item.adminOnly || role === "admin"
+  );
 
   return (
     <aside className="hidden w-60 shrink-0 flex-col border-r border-border bg-card lg:flex">
@@ -20,8 +29,8 @@ export function PortalSidebar() {
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto px-3 py-4">
         <ul className="flex flex-col gap-1">
-          {PORTAL_NAV.map((item) => {
-            const active = pathname.startsWith(item.href);
+          {visibleNav.map((item) => {
+            const active = pathname === item.href || pathname.startsWith(item.href + "/");
             return (
               <li key={item.href}>
                 <Link
@@ -40,6 +49,21 @@ export function PortalSidebar() {
           })}
         </ul>
       </nav>
+
+      {/* Profile link at bottom */}
+      <div className="border-t border-border px-3 py-3">
+        <Link
+          href="/profile"
+          className={cn(
+            "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150",
+            pathname === "/profile"
+              ? "bg-primary text-primary-foreground"
+              : "text-muted-foreground hover:bg-muted hover:text-foreground"
+          )}
+        >
+          Settings
+        </Link>
+      </div>
     </aside>
   );
 }

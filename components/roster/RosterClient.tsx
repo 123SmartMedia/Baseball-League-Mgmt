@@ -7,6 +7,7 @@ import { FormModal } from "@/components/forms/FormModal";
 import { Button } from "@/components/ui/Button";
 import { PlayerForm, EMPTY_PLAYER_FORM, playerToForm } from "./PlayerForm";
 import { CsvUpload } from "./CsvUpload";
+import { toast } from "@/lib/toast";
 import type { PlayerFormData } from "./PlayerForm";
 import type { Player } from "@/types";
 
@@ -32,6 +33,8 @@ export function RosterClient({
   const [formData, setFormData] = useState<PlayerFormData>(EMPTY_PLAYER_FORM);
   const [formError, setFormError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<Player | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   function openAdd() {
     setEditing(null);
@@ -99,12 +102,22 @@ export function RosterClient({
     }
   }
 
-  async function handleDelete(player: Player) {
-    if (!confirm(`Remove ${player.first_name} ${player.last_name} from the roster?`)) return;
-
-    const res = await fetch(`/api/players/${player.id}`, { method: "DELETE" });
-    if (res.ok) {
-      setPlayers((prev) => prev.filter((p) => p.id !== player.id));
+  async function handleDelete() {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/players/${deleteTarget.id}`, { method: "DELETE" });
+      if (res.ok) {
+        setPlayers((prev) => prev.filter((p) => p.id !== deleteTarget.id));
+        setDeleteTarget(null);
+        toast.success(`${deleteTarget.first_name} ${deleteTarget.last_name} removed.`);
+      } else {
+        toast.error("Failed to remove player.");
+      }
+    } catch {
+      toast.error("Network error.");
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -127,7 +140,7 @@ export function RosterClient({
 
     setSaving(false);
     startTransition(() => router.refresh());
-    alert(`${added} of ${rows.length} players imported successfully.`);
+    toast.success(`${added} of ${rows.length} players imported successfully.`);
   }
 
   return (
@@ -162,7 +175,7 @@ export function RosterClient({
               />
               {isAdmin && (
                 <button
-                  onClick={() => handleDelete(player)}
+                  onClick={() => setDeleteTarget(player)}
                   className="absolute right-14 top-1/2 -translate-y-1/2 rounded-lg px-2 py-1 text-xs text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:text-red-500"
                 >
                   Remove
@@ -189,6 +202,36 @@ export function RosterClient({
           </p>
         )}
       </FormModal>
+
+      {/* Delete confirm */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="w-full max-w-sm rounded-2xl bg-card p-6 shadow-xl">
+            <h3 className="mb-2">Remove Player?</h3>
+            <p className="mb-6 text-sm text-muted-foreground">
+              <span className="font-medium text-foreground">
+                {deleteTarget.first_name} {deleteTarget.last_name}
+              </span>{" "}
+              will be permanently removed from the roster.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="flex-1 rounded-xl border border-border py-2.5 text-sm font-medium hover:bg-muted transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="flex-1 rounded-xl bg-red-500 py-2.5 text-sm font-medium text-white hover:bg-red-600 transition-colors disabled:opacity-60"
+              >
+                {deleting ? "Removing…" : "Remove"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
